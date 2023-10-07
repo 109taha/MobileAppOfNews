@@ -3,13 +3,14 @@ const Blog = require("../model/blogSchema");
 const cloudinary = require("../helper/cloudinary");
 const upload = require("../helper/multer");
 const fs = require("fs");
-const { verifyAdmin } = require("../middleWares/verify");
+const { verifyAdmin, verifyUser } = require("../middleWares/verify");
 const JWT = require("jsonwebtoken");
 const User = require("../model/userSchema");
 const Categories = require("../model/blogCategories");
 var FCM = require("fcm-node");
 var serverKey = process.env.SERVERKEY;
 var fcm = new FCM(serverKey);
+const Comment = require("../model/comments");
 
 const sendNotification = async (title, body, deviceToken, ID) => {
   const message = {
@@ -544,6 +545,34 @@ router.get("/search/blog/category/:category", async (req, res, next) => {
     const totalPages = Math.ceil(total / limit);
     const item = { blog };
     res.status(200).send({ data: item, page, totalPages, limit, total });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
+});
+
+router.post("/comment/:blogId", verifyUser, async (req, res) => {
+  try {
+    const userId = req.user;
+    const blogId = req.params.blogId;
+    const { comment, parentId } = req.body;
+    if (!comment) {
+      return res
+        .status(400)
+        .send({ message: false, message: "You have to add a comment" });
+    }
+    const newComment = new Comment({
+      userId,
+      blogId,
+      comment,
+      parentId,
+    });
+    const commentId = newComment._id;
+    const blog = await Blog.findByIdAndUpdate(blogId, commentId, {
+      new: true,
+    });
+
+    await newComment.save();
+    res.status(200).send({ success: true, data: newComment });
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });
   }
