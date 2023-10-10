@@ -309,7 +309,7 @@ router.post(
           hashtagsId.push(newhash._id);
         }
       }
-      console.log(hashtagsId);
+
       const userId = req.user;
       const newBlog = new Blog({
         adminId: userId,

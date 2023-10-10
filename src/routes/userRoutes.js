@@ -75,6 +75,27 @@ router.post("/saved/blog", verifyUser, async (req, res) => {
   }
 });
 
+router.post("/hide/blog", verifyUser, async (req, res) => {
+  try {
+    const user = req.user;
+    const hideBloged = req.body.hideBloged;
+
+    const userFromDB = await User.findById(user);
+    if (!userFromDB) {
+      return res.status(404).send("User not found");
+    }
+
+    userFromDB.hideBloged.push(hideBloged);
+
+    await userFromDB.save();
+
+    return res.status(200).send("Blog saved successfully");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error: " + error.message);
+  }
+});
+
 router.put(
   "/profile/pic",
   upload.array("attachArtwork", 1),

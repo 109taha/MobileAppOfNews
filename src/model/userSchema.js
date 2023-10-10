@@ -35,6 +35,12 @@ const UserSchema = new mongoose.Schema(
         ref: "Blog",
       },
     ],
+    hideBloged: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Blog",
+      },
+    ],
     profile_pic: {
       type: String,
     },
