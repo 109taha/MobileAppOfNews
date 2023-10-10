@@ -566,13 +566,35 @@ router.post("/comment/:blogId", verifyUser, async (req, res) => {
       comment,
       parentId,
     });
-    const commentId = newComment._id;
-    const blog = await Blog.findByIdAndUpdate(blogId, commentId, {
-      new: true,
-    });
+    const commentIdFor = newComment._id.toString();
+
+    const blog = await Blog.findById(blogId);
+    if (!blog) {
+      return res.status(404).send("blog not found on that id");
+    }
+
+    blog.commentId.push(commentIdFor);
+    await blog.save();
 
     await newComment.save();
     res.status(200).send({ success: true, data: newComment });
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
+});
+
+router.get("/findcomment/:blogId", verifyUser, async (req, res) => {
+  try {
+    const blog = req.params.blogId;
+    const allComments = await Comment.find();
+    let findingBlog = [];
+    for (let index = 0; index < allComments.length; index++) {
+      const element = allComments[index];
+      if (element.blogId == blog) {
+        findingBlog.push(element);
+      }
+    }
+    return res.status(200).send({ success: true, data: findingBlog });
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });
   }
