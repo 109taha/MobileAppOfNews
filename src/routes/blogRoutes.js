@@ -11,6 +11,7 @@ var FCM = require("fcm-node");
 var serverKey = process.env.SERVERKEY;
 var fcm = new FCM(serverKey);
 const Comment = require("../model/comments");
+const HashTags = require("../model/hashtags");
 
 const sendNotification = async (title, body, deviceToken, ID) => {
   const message = {
@@ -260,39 +261,12 @@ router.post(
   verifyAdmin,
   upload.array("featureImg", 1),
   async (req, res) => {
-    // try {
-    //   const files = req.files;
-    //   const attachArtwork = [];
-    //   if (!files || files?.length < 1)
-    //     return res.status(401).json({
-    //       success: false,
-    //       message: "You have to upload at least one image to the listing",
-    //     });
-    //   for (const fileArray in files) {
-    //     for (const file in files[fileArray]) {
-    //       try {
-    //         const uploader = await cloudinary.uploader.upload(
-    //           files[fileArray][file].path,
-    //           {
-    //             folder: "Blogging",
-    //           }
-    //         );
-    //         attachArtwork.push({ url: uploader.url, type: fileArray });
-    //         fs.unlinkSync(files[fileArray][file].path);
-    //       } catch (err) {
-    //         if (attachArtwork?.length) {
-    //           const imgs = attachArtwork.map((obj) => obj.public_id);
-    //           cloudinary.api.delete_resources(imgs);
-    //         }
-    //         console.log(err);
-    //       }
-    //     }
-    //   }
     const files = req.files;
     const featureImg = [];
 
     try {
       if (!files || files?.length < 1) {
+        return res.status(400).send({ message: "kindly upload One pic" });
       } else {
         for (const file of files) {
           const { path } = file;
@@ -322,25 +296,20 @@ router.post(
           .send("you have to add title and category of the blog");
       }
 
-      // const featureImgMain = attachArtwork[0].url;
-      // attachArtwork.shift();
+      const hashtags = req.body.hashtags.split(",");
 
-      // let attachArtworkCount = 0;
-      // console.log(attachArtwork);
-      // for (let testIndex = 0; testIndex < data.length; testIndex++) {
-      //   if (data[testIndex].ctype == "image") {
-      //     if (attachArtworkCount < attachArtwork.length) {
-      //       data[testIndex].content = attachArtwork[attachArtworkCount].url;
-      //       attachArtworkCount++;
-      //     } else {
-      //       console.error(
-      //         "Not enough elements in attachArtwork to cover all images."
-      //       );
-      //       break;
-      //     }
-      //   }
-      // }
-
+      let hashtagsId = [];
+      for (const hashtag of hashtags) {
+        const findinghash = await HashTags.findOne({ name: hashtag });
+        if (findinghash) {
+          hashtagsId.push(findinghash._id);
+        } else {
+          const newhash = new HashTags({ name: hashtag });
+          await newhash.save();
+          hashtagsId.push(newhash._id);
+        }
+      }
+      console.log(hashtagsId);
       const userId = req.user;
       const newBlog = new Blog({
         adminId: userId,
@@ -348,8 +317,9 @@ router.post(
         title: titles,
         data: data,
         categories,
+        hashtags: hashtagsId,
       });
-      await newBlog.save();
+
       const user = await User.find();
       let tokendeviceArray = [];
       for (let index = 0; index < user.length; index++) {

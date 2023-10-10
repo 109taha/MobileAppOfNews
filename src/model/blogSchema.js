@@ -37,13 +37,12 @@ const BlogSchema = new mongoose.Schema(
         },
       ],
     },
-    hashTags: {
-      type: [
-        {
-          type: String,
-        },
-      ],
-    },
+    hashtags: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "HashTags",
+      },
+    ],
     views: {
       type: Number,
     },
