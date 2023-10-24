@@ -280,7 +280,15 @@ router.post("/create/user", UserJoiSchema, async (req, res) => {
 router.put("/update/:id", async (req, res) => {
   try {
     const userId = req.params.id;
-    const { email, name, password, phone_number, devicetoken } = req.body;
+    const {
+      email,
+      name,
+      password,
+      phone_number,
+      devicetoken,
+      bio,
+      UserCategories,
+    } = req.body;
 
     const user = await User.findById(userId);
 
@@ -291,6 +299,8 @@ router.put("/update/:id", async (req, res) => {
     user.name = name || user.name;
     user.phone_number = phone_number || user.phone_number;
     user.devicetoken = devicetoken || user.devicetoken;
+    user.bio = bio || user.bio;
+    user.UserCategories = UserCategories || user.UserCategories;
 
     if (password) {
       const salt = await bcrypt.genSalt(10);

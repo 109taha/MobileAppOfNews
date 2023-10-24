@@ -41,6 +41,16 @@ const UserSchema = new mongoose.Schema(
         ref: "Blog",
       },
     ],
+    UserCategories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Categories",
+      },
+    ],
+    bio: {
+      type: String,
+      require: true,
+    },
     profile_pic: {
       type: String,
     },
