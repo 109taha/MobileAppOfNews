@@ -268,13 +268,11 @@ router.post("/create/user", UserJoiSchema, async (req, res) => {
     });
 
     await newUser.save();
-    res
-      .status(200)
-      .send({
-        success: true,
-        message: "User registered successfully",
-        data: newUser,
-      });
+    res.status(200).send({
+      success: true,
+      message: "User registered successfully",
+      data: newUser,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error: " + error.message);
