@@ -23,7 +23,6 @@ router.post("/create/admin", AdminJoiSchema, async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    console.log(hashedPassword);
 
     const newAdmin = new Admin({
       email,
@@ -32,7 +31,6 @@ router.post("/create/admin", AdminJoiSchema, async (req, res) => {
       phone_number,
       devicetoken,
     });
-    console.log(newAdmin);
     await newAdmin.save();
     res
       .status(200)
@@ -123,7 +121,6 @@ router.put(
           }
         }
       }
-      console.log(attachArtwork);
       const users = req.user;
 
       const user = await User.findById(users);
@@ -179,7 +176,6 @@ router.post("/forgot-password/admin", async (req, res) => {
       return res.status(400).send("No Admin found on that email");
     }
     const token = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
-    console.log(token);
     sendResetEmail(email, token);
     res.json({
       success: true,
@@ -203,7 +199,6 @@ router.post("/forgot-password", async (req, res) => {
       return res.status(400).send("no User found on that email");
     }
     const token = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
-    console.log(token);
     sendResetEmail(email, token);
     res.send({
       success: true,
@@ -225,13 +220,11 @@ router.post("/reset-password/:email", async (req, res) => {
 
     let user = await User.findOne({ email: userEmail });
     if (user) {
-      console.log(user.password);
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
       user.password = hashedPassword;
       user = await user.save();
-      console.log(user.password);
 
       res.status(200).send({ message: "Password reset successful" });
     }
@@ -379,7 +372,6 @@ router.get("/find/user/:id", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body);
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -421,12 +413,10 @@ router.post("/login/user", async (req, res) => {
       });
     }
     const user = await User.findOne({ email });
-    console.log(user);
     if (!user) {
       return res.status(404).send("Invalid Email!");
     }
     const validUserPassword = await bcrypt.compare(password, user.password);
-    console.log(validUserPassword);
     if (validUserPassword == false) {
       return res.status(400).send("Password Is incorrect");
     }
