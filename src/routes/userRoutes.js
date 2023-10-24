@@ -135,7 +135,14 @@ router.put(
 
       await user.save();
 
-      res.status(200).send("Profile pic added successfully ");
+      const token = JWT.sign({ userId: user._id }, process.env.JWT_SEC);
+
+      return res.status(200).json({
+        success: true,
+        message: "User Updated successful",
+        token,
+        user,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).send("Internal Server Error: " + error.message);
@@ -314,7 +321,14 @@ router.put("/update/:id", async (req, res) => {
     }
 
     await user.save();
-    res.status(200).send({ message: "User updated successfully", user });
+    const token = JWT.sign({ userId: user._id }, process.env.JWT_SEC);
+
+    return res.status(200).json({
+      success: true,
+      message: "User login successful",
+      token,
+      user,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error: " + error.message);
