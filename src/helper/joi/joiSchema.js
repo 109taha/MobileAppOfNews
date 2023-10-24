@@ -17,8 +17,6 @@ const AdminJoiSchema = (req, res, next) => {
 };
 
 const UserSchema = Joi.object({
-  name: Joi.string().required(),
-  phone_number: Joi.number().required(),
   email: Joi.string().required(),
   password: Joi.string().required(),
 }).unknown(true);

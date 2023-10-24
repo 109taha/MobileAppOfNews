@@ -250,7 +250,7 @@ router.post("/reset-password/:email", async (req, res) => {
 router.post("/create/user", UserJoiSchema, async (req, res) => {
   try {
     const { email, name, password, phone_number, devicetoken } = req.body;
-    if (!email || !name || !password || !phone_number) {
+    if (!email || !password) {
       return res.status(400).send("you have to provide all of the field");
     }
     const exisitUser = await User.findOne({ email });
