@@ -259,7 +259,7 @@ router.post("/create/user", UserJoiSchema, async (req, res) => {
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({
+    const user = new User({
       email,
       name,
       password: hashedPassword,
@@ -267,11 +267,14 @@ router.post("/create/user", UserJoiSchema, async (req, res) => {
       devicetoken,
     });
 
-    await newUser.save();
-    res.status(200).send({
+    await user.save();
+    const token = JWT.sign({ userId: user._id }, process.env.JWT_SEC);
+
+    return res.status(200).json({
       success: true,
-      message: "User registered successfully",
-      data: newUser,
+      message: "User login successful",
+      token,
+      user,
     });
   } catch (error) {
     console.error(error);
