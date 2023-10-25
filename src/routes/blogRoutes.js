@@ -340,6 +340,8 @@ router.post(
           sendNotification(title, body, eachToken, ID);
         });
 
+      await newBlog.save();
+
       res.status(200).json({ success: true, newBlog });
     } catch (error) {
       console.error("Error creating blog post:", error);
