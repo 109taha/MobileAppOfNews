@@ -87,7 +87,7 @@ router.post("/hide/blog", verifyUser, async (req, res) => {
 
     await userFromDB.save();
 
-    return res.status(200).send("Blog saved successfully");
+    return res.status(200).send("Blog hide successfully");
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error: " + error.message);
