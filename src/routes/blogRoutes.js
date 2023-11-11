@@ -558,7 +558,8 @@ router.post("/comment/:blogId", verifyUser, async (req, res) => {
 router.get("/findcomment/:blogId", verifyUser, async (req, res) => {
   try {
     const blog = req.params.blogId;
-    const allComments = await Comment.find().populate({
+    const total = await Comment.countDocuments({ blogId: blog });
+    const allComments = await Comment.find({ blogId: blog }).populate({
       path: "userId",
       select: " name profile_pic ",
     });
@@ -569,7 +570,7 @@ router.get("/findcomment/:blogId", verifyUser, async (req, res) => {
         findingBlog.push(element);
       }
     }
-    return res.status(200).send({ success: true, data: findingBlog });
+    return res.status(200).send({ success: true, data: findingBlog, total });
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });
   }
@@ -578,10 +579,7 @@ router.get("/findcomment/:blogId", verifyUser, async (req, res) => {
 router.get("/findBlogcomment/:blogId", verifyUser, async (req, res) => {
   try {
     const blog = req.params.blogId;
-    const allComments = await Comment.find().populate({
-      path: "userId",
-      select: "name profile_pic",
-    });
+    const allComments = await Comment.find().populate("userId");
     let findingBlog = [];
     for (let index = 0; index < allComments.length; index++) {
       const element = allComments[index];
