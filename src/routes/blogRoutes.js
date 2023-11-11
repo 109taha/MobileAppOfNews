@@ -578,7 +578,10 @@ router.get("/findcomment/:blogId", verifyUser, async (req, res) => {
 router.get("/findBlogcomment/:blogId", verifyUser, async (req, res) => {
   try {
     const blog = req.params.blogId;
-    const allComments = await Comment.find().populate("userId");
+    const allComments = await Comment.find().populate({
+      path: "userId",
+      select: "name profile_pic",
+    });
     let findingBlog = [];
     for (let index = 0; index < allComments.length; index++) {
       const element = allComments[index];
