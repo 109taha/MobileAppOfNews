@@ -591,18 +591,12 @@ router.get("/findcomment/:blogId", verifyUser, async (req, res) => {
   }
 });
 
-router.get("/findBlogcomment/:blogId", verifyUser, async (req, res) => {
+router.get("/findBlogcomment/:userId", verifyUser, async (req, res) => {
   try {
-    const blog = req.params.blogId;
-    const allComments = await Comment.find().populate("userId");
-    let findingBlog = [];
-    for (let index = 0; index < allComments.length; index++) {
-      const element = allComments[index];
-      if (element.blogId == blog) {
-        findingBlog.push(element);
-      }
-    }
-    return res.status(200).send({ success: true, data: findingBlog });
+    const user = req.params.userId;
+    const allComments = await Comment.find({ userId: user });
+
+    return res.status(200).send({ success: true, data: allComments });
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });
   }
