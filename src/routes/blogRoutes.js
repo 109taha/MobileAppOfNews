@@ -420,15 +420,30 @@ router.get("/all/blogs", verifyUser, async (req, res) => {
       .sort(sortBY)
       .select("title featureImg createdAt views");
 
+    let allBlogsFinal = [];
+    for (let i = 0; i < allBlog.length; i++) {
+      const element = allBlog[i]._id;
+      const comment = await Comment.countDocuments({ blogId: element });
+      allBlogsFinal.push(allBlog[i]);
+      allBlogsFinal[i].commentCount = comment;
+      console.log(allBlogsFinal[i]);
+    }
     if (!allBlog.length > 0) {
       return res.status(400).send("no blog found!");
     }
 
     const totalPages = Math.ceil(total / limit);
 
-    res
-      .status(200)
-      .send({ success: true, data: allBlog, page, totalPages, limit, total });
+    console.log(allBlogsFinal[1].commentCount);
+
+    res.status(200).send({
+      success: true,
+      data: allBlogsFinal,
+      page,
+      totalPages,
+      limit,
+      total,
+    });
   } catch (error) {
     console.error("Error creating blog post:", error);
     return res.status(500).json({ error: "Internal server error" });

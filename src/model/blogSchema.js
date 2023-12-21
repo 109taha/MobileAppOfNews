@@ -46,12 +46,9 @@ const BlogSchema = new mongoose.Schema(
     views: {
       type: Number,
     },
-    commentId: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Comment",
-      },
-    ],
+    commentCount: {
+      type: Number,
+    },
   },
   { timestamps: true }
 );
