@@ -504,8 +504,16 @@ router.get("/search/blog/:title", async (req, res, next) => {
       .skip(skip)
       .limit(limit);
 
+    let allBlogsFinal = [];
+    for (let i = 0; i < blog.length; i++) {
+      const element = blog[i]._id;
+      const comment = await Comment.countDocuments({ blogId: element });
+      allBlogsFinal.push(blog[i]);
+      allBlogsFinal[i].commentCount = comment;
+      console.log(allBlogsFinal[i]);
+    }
     const totalPages = Math.ceil(total / limit);
-    const item = { blog };
+    const item = { allBlogsFinal };
     res.status(200).send({ data: item, page, totalPages, limit, total });
   } catch (error) {
     res.status(500).send({ message: "Internal server error" });
