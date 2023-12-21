@@ -594,7 +594,7 @@ router.get("/findcomment/:blogId", verifyUser, async (req, res) => {
 router.get("/findBlogcomment/:userId", verifyUser, async (req, res) => {
   try {
     const user = req.params.userId;
-    const allComments = await Comment.find({ userId: user });
+    const allComments = await Comment.find({ userId: user }).populate("blogId");
 
     return res.status(200).send({ success: true, data: allComments });
   } catch (error) {
