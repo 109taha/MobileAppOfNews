@@ -531,7 +531,7 @@ router.get("/search/blog/category/:category", async (req, res, next) => {
     let sortBY = { createdAt: -1 };
 
     const blog = await Blog.find({ categories: searchfield })
-      .select("featureImg title createdAt")
+      .select("featureImg title views createdAt")
       .skip(skip)
       .limit(limit)
       .sort(sortBY)
