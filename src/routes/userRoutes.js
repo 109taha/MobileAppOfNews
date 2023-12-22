@@ -9,6 +9,8 @@ const fs = require("fs");
 const { AdminJoiSchema, UserJoiSchema } = require("../helper/joi/joiSchema");
 const sendResetEmail = require("../helper/nodemailer");
 const { verifyUser } = require("../middleWares/verify");
+const Blog = require("../model/blogSchema");
+const Comment = require("../model/comments");
 
 router.post("/create/admin", AdminJoiSchema, async (req, res) => {
   try {
@@ -151,16 +153,40 @@ router.get("/saved/blogs", verifyUser, async (req, res) => {
   try {
     const user = req.user;
 
-    const userWithBlogs = await User.findById(user).populate({
-      path: "savedBloged",
-      select: "title featureImg createdAt",
-      populate: { path: "categories", select: "name" },
-    });
+    const userWithBlogs = await User.findById(user);
     if (!userWithBlogs) {
       return res.status(404).send("User not found");
     }
-    const blogged = userWithBlogs.savedBloged;
-    return res.status(200).json(blogged);
+    // .populate({
+    //   path: "savedBloged",
+    //   select: "title views commentCount featureImg createdAt",
+    //   populate: { path: "categories", select: "name" },
+    // });
+    const blogId = userWithBlogs.savedBloged;
+    const allBlogs = [];
+    for (let i = 0; i < blogId.length; i++) {
+      const element = blogId[i];
+      console.log(element);
+      const blog = await Blog.findById(element)
+        .select("title views commentId featureImg createdAt")
+        .populate({ path: "categories", select: "name" });
+      // console.log(blog);
+      allBlogs.push(blog);
+    }
+    console.log(allBlogs);
+
+    let allBlogsFinal = [];
+    for (let i = 0; i < allBlogs.length; i++) {
+      const element = allBlogs[i]._id;
+      console.log(element);
+      const comment = await Comment.countDocuments({ blogId: element });
+      allBlogsFinal.push(allBlogs[i]);
+      allBlogsFinal[i].commentCount = comment;
+      console.log(allBlogsFinal[i]);
+    }
+
+    // const blogged = userWithBlogs.savedBloged;
+    return res.status(200).json(allBlogsFinal);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error: " + error.message);
