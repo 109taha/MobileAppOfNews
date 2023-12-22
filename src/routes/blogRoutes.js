@@ -453,17 +453,49 @@ router.get("/all/blogs", verifyUser, async (req, res) => {
 router.get("/one/blogs/:Id", async (req, res) => {
   try {
     const blogID = req.params.Id;
-    const updatedBlog = await Blog.findOneAndUpdate(
+    const blog = await Blog.findOneAndUpdate(
       { _id: blogID },
       { $inc: { views: 1 } },
       { new: true }
-    ).populate("categories");
+    )
+      .populate("categories")
+      .populate("hashtags")
+      .populate("commentId");
 
-    if (!updatedBlog) {
+    if (!blog) {
       return res.status(400).send("No blog found!");
     }
 
-    res.status(200).send({ success: true, updatedBlog });
+    const commentCount = await Comment.countDocuments({ blogId: blogID });
+    // const blog = await Blog.find({ categories: searchfield })
+    //   .select("featureImg title views createdAt")
+    //   .skip(skip)
+    //   .limit(limit)
+    //   .sort(sortBY)
+    //   .populate({ path: "categories", select: "name" });
+
+    // let allBlogsFinal = [];
+    // for (let i = 0; i < blog.length; i++) {
+    //   const element = blog[i]._id;
+    //   const comment = await Comment.countDocuments({ blogId: element });
+    //   allBlogsFinal.push(blog[i]);
+    //   allBlogsFinal[i].commentCount = comment;
+    //   console.log(allBlogsFinal[i]);
+    // }
+    const cleanBlogData = {
+      _id: blog._id,
+      featureImg: blog.featureImg,
+      title: blog.title,
+      data: blog.data,
+      categories: blog.categories,
+      hashtags: blog.hashtags,
+      commentId: blog.commentId,
+      createdAt: blog.createdAt,
+      updatedAt: blog.updatedAt,
+      views: blog.views,
+      commentCount: commentCount,
+    };
+    res.status(200).send({ success: true, cleanBlogData });
   } catch (error) {
     console.error("Error updating blog view count:", error);
     return res.status(500).json({ error: "Internal server error" });
