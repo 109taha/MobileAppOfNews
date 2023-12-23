@@ -651,4 +651,42 @@ router.get("/findBlogcomment/:userId", verifyUser, async (req, res) => {
   }
 });
 
+router.get("/likeComment/:commentId", verifyUser, async (req, res) => {
+  try {
+    const userId = req.user;
+    console.log(userId);
+    const commentId = req.params.commentId;
+
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+      return res
+        .status(404)
+        .send({ success: false, message: "No comments found on that Id" });
+    }
+
+    const like = comment.like;
+
+    // Check if the user ID is already in the like array
+    const userIndex = like.indexOf(userId);
+
+    if (userIndex !== -1) {
+      // User ID is already in the like array, remove it
+      like.splice(userIndex, 1);
+    } else {
+      // User ID is not in the like array, add it
+      like.push(userId);
+    }
+
+    await comment.save();
+
+    res.status(200).send({ success: true, data: comment });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: "Internal server error" });
+  }
+});
+
 module.exports = router;

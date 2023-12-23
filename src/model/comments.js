@@ -19,6 +19,12 @@ const CommentSchema = new mongoose.Schema(
       require: true,
       ref: "Blog",
     },
+    like: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );
