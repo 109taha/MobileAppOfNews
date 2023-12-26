@@ -689,4 +689,24 @@ router.get("/likeComment/:commentId", verifyUser, async (req, res) => {
   }
 });
 
+router.get("/deleteComment/:commentId", async (req, res) => {
+  try {
+    const commentId = req.params.commentId;
+
+    const comment = await Comment.findByIdAndDelete(commentId);
+    console.log(commentId);
+    if (!comment) {
+      return res
+        .status(404)
+        .send({ success: false, message: "No comments found on that Id" });
+    }
+    res.status(200).send({ success: true, data: comment });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: "Internal server error" });
+  }
+});
+
 module.exports = router;
