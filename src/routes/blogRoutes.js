@@ -619,14 +619,16 @@ router.post("/comment/:blogId", verifyUser, async (req, res) => {
   }
 });
 
-router.get("/findcomment/:blogId", verifyUser, async (req, res) => {
+router.get("/findcomment/:blogId", async (req, res) => {
   try {
     const blog = req.params.blogId;
+    console.log(blog);
     const total = await Comment.countDocuments({ blogId: blog });
     const allComments = await Comment.find({ blogId: blog }).populate({
       path: "userId",
       select: " name profile_pic ",
     });
+    console.log(allComments);
     let findingBlog = [];
     for (let index = 0; index < allComments.length; index++) {
       const element = allComments[index];
@@ -640,7 +642,7 @@ router.get("/findcomment/:blogId", verifyUser, async (req, res) => {
   }
 });
 
-router.get("/findBlogcomment/:userId", verifyUser, async (req, res) => {
+router.get("/findBlogcomment/:userId", async (req, res) => {
   try {
     const user = req.params.userId;
     const allComments = await Comment.find({ userId: user }).populate("blogId");
