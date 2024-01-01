@@ -33,7 +33,11 @@ router.get("/all/query", async (req, res) => {
     const skip = (page - 1) * limit;
     const total = await Query.countDocuments();
 
-    const allQuery = await Query.find().sort({ createdAt: -1 });
+    const allQuery = await Query.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .sort(sortBY);
     if (!allQuery.length > 0) {
       return res.status(400).send("no query found!");
     }
